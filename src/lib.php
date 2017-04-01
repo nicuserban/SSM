@@ -44,14 +44,14 @@ class SteamStatsMania
         curl_close($curl);
         
         if (empty($res)) {
-            // Log wrong request/answer;
+            // TO DO: Log wrong request/answer;
             return false;
         }
         
         $decodeMethod = 'steam' . strtoupper($this->format) . 'Decode';
         $data = $this->$decodeMethod($res);
         if (empty($data)) {
-            // Log error answer;
+            // TO DO: Log error answer;
             return false;
         }
         

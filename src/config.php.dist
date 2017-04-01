@@ -1,0 +1,3 @@
+<?php
+$apiKey = 'YOUR_STEAM_API_KEY_HERE';
+$domainName = 'YOUR_DOMAIN_REGISTERED_ON_STEAM_HERE';
