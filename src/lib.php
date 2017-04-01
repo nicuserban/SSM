@@ -87,13 +87,22 @@ class SteamStatsMania
         return $res->response->steamid;
     }
     
-    public function getOwnedGames($steamId)
+    public function getOwnedGames($steamId, $includeAppinfo = false, $includePlayedFreeGames = false)
     {
         if (empty($steamId)) {
             return false;
         }
         
-        $res = $this->makeRequest('IPlayerService', 'GetOwnedGames', 'v0001', array('steamid' => $steamId));
+        $res = $this->makeRequest(
+            'IPlayerService',
+            'GetOwnedGames',
+            'v0001',
+            array(
+                'steamid' => $steamId,
+                'include_appinfo' => $includeAppinfo,
+                'include_played_free_games' => $includePlayedFreeGames
+            )
+        );
         
         if (empty($res) || empty($res->response)) {
             return false;

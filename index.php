@@ -8,7 +8,7 @@ require_once 'src/lib.php';
 $api = new SteamStatsMania($apiKey);
 
 $steamUserId = $api->getSteamUserIdByVanityUrl('restlesss');
-$ownedGames = $api->getOwnedGames($steamUserId);
+$ownedGames = $api->getOwnedGames($steamUserId, true, true);
 
 echo '<pre>';
 var_dump($steamUserId);
