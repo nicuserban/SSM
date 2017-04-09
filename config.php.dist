@@ -1,3 +1,11 @@
 <?php
 $apiKey = 'YOUR_STEAM_API_KEY_HERE';
 $domainName = 'YOUR_DOMAIN_REGISTERED_ON_STEAM_HERE';
+
+/* YOUR DATABASE CONNECTION DETAILS */
+$useDb  = false;
+$dbHost = 'YOUR_DB_HOST_HERE';
+$dbPort = 'YOUR_DB_PORT_HERE';
+$dbName = 'YOUR_DB_NAME_HERE';
+$dbUser = 'YOUR_DB_USER_NAME_HERE';
+$dbPassword ='YOUR_DB_PASSWORD_HERE';

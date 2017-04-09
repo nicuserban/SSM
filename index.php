@@ -5,12 +5,18 @@
 
 require_once 'config.php';
 require_once 'src/lib.php';
-$api = new SteamStatsMania($apiKey);
+$dbParams = array();
+if ($useDb) {
+    $dbParams = array(
+        'dbHost' => $dbHost,
+        'dbName' => $dbName,
+        'dbUser' => $dbUser,
+        'dbPassword' => $dbPassword
+    );
+}
+
+$api = new SteamStatsMania($apiKey, $dataFormat, $dbParams);
+
 
 $steamUserId = $api->getSteamUserIdByVanityUrl('restlesss');
 $ownedGames = $api->getOwnedGames($steamUserId, true, true);
-
-echo '<pre>';
-var_dump($steamUserId);
-var_dump($ownedGames);
-die;

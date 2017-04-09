@@ -11,13 +11,29 @@ class SteamStatsMania
 
     protected $apiKey;
     protected $format = 'json';
+    protected $db = null;
 
-    public function __construct($apiKey, $format = null)
+    public function __construct($apiKey, $format = null, $dbParams = array())
     {
         $this->apiKey = $apiKey;
         if (!empty($format) && in_array($format, self::ALLOWED_FORMATS)) {
             $this->format = $format;
         }
+
+        if (!empty($dbParams)) {
+            $dsn = "mysql:dbname={$dbParams['dbName']};host={$dbParams['dbHost']}";
+            if (!empty($dbParams['dbPort'])) {
+                $dsn .= ";port={$dbParams['dbPort']}";
+            }
+
+            try {
+                $this->db = new PDO($dsn, $dbParams['dbUser'], $dbParams['dbPassword']);
+            } catch (PDOException $e) {
+                echo 'Database connection failed: ' . $e->getMessage();
+                die;
+            }
+        }
+
     }
 
     private function buildRequestUrl($interface, $method, $version, $params = array())
@@ -124,5 +140,19 @@ class SteamStatsMania
         }
         
         return $res;
+    }
+
+    public function getPlayerAchievements($steamId, $appId)
+    {
+        if (empty($steamId) || empty($appId)) {
+            return false;
+        }
+
+        $res = $this->makeRequest('ISteamUserStats', 'GetPlayerAchievements', 'v0001',array('steamid' => $steamId, 'appid' => $appId));
+        if (empty($res->playerstats)) {
+            return false;
+        }
+
+        return $res->playerstats;
     }
 }

@@ -1,7 +1,26 @@
 **STEAM STATS MANIA**
 
+*NOTE: I AM NOT endorsed or affiliated with STEAM or VALVE. Data gathering
+is only intended for personal usage.
+
+Some methods of this implementation will require a large amount of time
+and a big number of requests to perform. They should be run only by respecting
+the 100 000 requests limit per day as specified in STEAM API terms of use.
+
+For operations like getAllAchievments for player you should run the 
+script with a large max_execution_time (and possible memory_limit), depending on the number
+of steam games.
+
+In order to use this implementation, the developer should:
 1)Copy the content of config.php.dist in a new file named config.php,
 or simply rename config.php.dist into config.php
 2)In config.php replace the values of $apiKey and $domainName with the
 values of API key obtained from steam and the domain used when registered 
 developer account.
+3)For the data format, for the moment only json is available in this implementation, 
+so the value of $dataFormat should remain unchanged.
+4)If you intend to use database, you should also add the details related
+to database connection (for the moment only mysql is supported). Just copy
+all the params into config.php, change $useDb value to true, and 
+enter db connection details for the other params. 
+Note that the port is optional. Leave it empty if you don't need to specify it.
