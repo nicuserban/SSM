@@ -6,6 +6,9 @@
 class SteamStatsMania
 {
 
+    public $steamUserVanityName = null;
+    public $steamUserId = null;
+
     const API_ENDPOINT = 'http://api.steampowered.com';
     const ALLOWED_FORMATS = array('json', 'xml', 'vdf');
 
@@ -103,7 +106,7 @@ class SteamStatsMania
         return $res->response->steamid;
     }
     
-    public function getOwnedGames($steamId, $includeAppinfo = false, $includePlayedFreeGames = false)
+    public function getOwnedGames($steamId, $includePlayedFreeGames = false, $includeAppinfo = false)
     {
         if (empty($steamId)) {
             return false;
@@ -144,7 +147,7 @@ class SteamStatsMania
 
     public function getPlayerAchievements($steamId, $appId)
     {
-        if (empty($steamId) || empty($appId)) {
+        if (empty($steamId) || empty($appId) || empty($this->db)) {
             return false;
         }
 
@@ -154,5 +157,64 @@ class SteamStatsMania
         }
 
         return $res->playerstats;
+    }
+
+    // Either vanity name or user id can be used
+    public function getAllAchievmentsForPlayer($steamUserVanityName = null, $steamUserId = null)
+    {
+        ini_set('max_execution_time', 1000);
+        if (empty($steamUserVanityName) && empty($steamUserId)) {
+            return false;
+        } elseif (!empty($steamUserVanityName)) {
+            $this->steamUserVanityName = $steamUserVanityName;
+            if (!empty($steamUserId)) {
+                $this->steamUserId = $steamUserId;
+            } else {
+                $this->steamUserId = $this->getSteamUserIdByVanityUrl($this->steamUserVanityName);
+            }
+        }
+
+        if (empty($this->steamUserId)) {
+            return false;
+        }
+        if (empty($this->steamUserVanityName)) {
+            $this->steamUserVanityName = $this->steamUserId;
+        }
+
+        $ownedGames = $this->getOwnedGames($this->steamUserId, true);
+
+        // This section is heavy on number of requests, if the user has many games.
+        if (!empty($ownedGames->games)) {
+            foreach ($ownedGames->games as $game) {
+                $achievements = $this->getPlayerAchievements($this->steamUserId, $game->appid);
+                if ($achievements->success && !empty($achievements->achievements)) {
+                   $aNr = count($achievements->achievements);
+                   $aPNr = 0;
+                   foreach ($achievements->achievements as $achievement) {
+                       if ($achievement->achieved) {
+                           $aPNr++;
+                       }
+                   }
+                   if ($aPNr) {
+                       $query = "INSERT INTO `player_achievments`(player_vanity_name, game_name, achievements_nr, achieved_by_player)
+                                  VALUES(:steamUserVanityName, :game_name, :a_nr, :a_p_nr)";
+                       $stmt = $this->db->prepare($query);
+                       try {
+                           $stmt->execute(array(
+                               ':steamUserVanityName' => $this->steamUserVanityName,
+                               ':game_name' => $achievements->gameName,
+                               ':a_nr' => $aNr,
+                               ':a_p_nr' => $aPNr
+                           ));
+                       } catch (PDOException $e) {
+                           // @TO DO - log sql query errors
+                       }
+                   }
+                }
+            }
+
+            echo 'Finished';
+
+        }
     }
 }

@@ -17,6 +17,4 @@ if ($useDb) {
 
 $api = new SteamStatsMania($apiKey, $dataFormat, $dbParams);
 
-
-$steamUserId = $api->getSteamUserIdByVanityUrl('restlesss');
-$ownedGames = $api->getOwnedGames($steamUserId, true, true);
+$api->getAllAchievmentsForPlayer('restlesss');

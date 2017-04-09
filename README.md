@@ -7,9 +7,13 @@ Some methods of this implementation will require a large amount of time
 and a big number of requests to perform. They should be run only by respecting
 the 100 000 requests limit per day as specified in STEAM API terms of use.
 
-For operations like getAllAchievments for player you should run the 
+For operations like getAllAchievmentsForPlayer for player you should run the 
 script with a large max_execution_time (and possible memory_limit), depending on the number
 of steam games.
+
+This library can be used, by modifying index.php, to query various
+steam methods, or to save some steam data in your database (for the moment
+a list of player achievments).
 
 In order to use this implementation, the developer should:
 1)Copy the content of config.php.dist in a new file named config.php,
@@ -24,3 +28,9 @@ to database connection (for the moment only mysql is supported). Just copy
 all the params into config.php, change $useDb value to true, and 
 enter db connection details for the other params. 
 Note that the port is optional. Leave it empty if you don't need to specify it.
+5)Also, dump db structure provided in the repo into your database.
+(For the moment only table for players achievments is available).
+
+@TO DO 
+Make an additional clas for operations related to player
+(like getAllAchievmentsForPlayer)
