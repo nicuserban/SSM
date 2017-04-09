@@ -15,21 +15,21 @@ This library can be used, by modifying index.php, to query various
 steam methods, or to save some steam data in your database (for the moment
 a list of player achievments).
 
-In order to use this implementation, the developer should:
+In order to use this implementation, the developer should:  
 1)Copy the content of config.php.dist in a new file named config.php,
-or simply rename config.php.dist into config.php
+or simply rename config.php.dist into config.php  
 2)In config.php replace the values of $apiKey and $domainName with the
 values of API key obtained from steam and the domain used when registered 
-developer account.
+developer account.  
 3)For the data format, for the moment only json is available in this implementation, 
-so the value of $dataFormat should remain unchanged.
+so the value of $dataFormat should remain unchanged.  
 4)If you intend to use database, you should also add the details related
 to database connection (for the moment only mysql is supported). Just copy
 all the params into config.php, change $useDb value to true, and 
-enter db connection details for the other params. 
-Note that the port is optional. Leave it empty if you don't need to specify it.
+enter db connection details for the other params.
+Note that the port is optional. Leave it empty if you don't need to specify it.  
 5)Also, dump db structure provided in the repo into your database.
-(For the moment only table for players achievments is available).
+(For the moment only table for players achievments is available).  
 
 @TO DO 
 Make an additional clas for operations related to player
