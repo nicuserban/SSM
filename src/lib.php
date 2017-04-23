@@ -203,7 +203,7 @@ class SteamStatsMania
                        }
                    }
                    if ($aPNr) {
-                       $query = "INSERT INTO `player_achievments`(player_vanity_name, game_name, achievements_nr, achieved_by_player)
+                       $query = "INSERT INTO `player_achievements`(player_vanity_name, game_name, achievements_nr, achieved_by_player)
                                   VALUES(:steamUserVanityName, :game_name, :a_nr, :a_p_nr)
                                   ON DUPLICATE KEY UPDATE achieved_by_player=VALUES(achieved_by_player)";
                        $stmt = $this->db->prepare($query);
