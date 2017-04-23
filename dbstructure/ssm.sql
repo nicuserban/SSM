@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: 127.0.0.1
--- Generation Time: Apr 09, 2017 at 08:06 PM
+-- Generation Time: Apr 23, 2017 at 11:27 AM
 -- Server version: 10.1.8-MariaDB
 -- PHP Version: 5.6.14
 
@@ -23,10 +23,10 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
--- Table structure for table `player_achievments`
+-- Table structure for table `player_achievements`
 --
 
-CREATE TABLE `player_achievments` (
+CREATE TABLE `player_achievements` (
   `id` int(11) NOT NULL,
   `player_vanity_name` varchar(255) NOT NULL,
   `game_name` varchar(255) NOT NULL,
@@ -39,19 +39,20 @@ CREATE TABLE `player_achievments` (
 --
 
 --
--- Indexes for table `player_achievments`
+-- Indexes for table `player_achievements`
 --
-ALTER TABLE `player_achievments`
-  ADD PRIMARY KEY (`id`);
+ALTER TABLE `player_achievements`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `player_game` (`player_vanity_name`,`game_name`);
 
 --
 -- AUTO_INCREMENT for dumped tables
 --
 
 --
--- AUTO_INCREMENT for table `player_achievments`
+-- AUTO_INCREMENT for table `player_achievements`
 --
-ALTER TABLE `player_achievments`
+ALTER TABLE `player_achievements`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;

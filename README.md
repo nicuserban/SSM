@@ -31,7 +31,8 @@ enter db connection details for the other params.
 Note that the port is optional. Leave it empty if you don't need to specify it.  
 5)Also, dump db structure provided in the repo into your database.
 (For the moment only table for players achievements is available).  
+@TO DO - extend and optimize db structure 
 
 @TO DO 
-Make an additional clas for operations related to player
+Make an additional class for operations related to player
 (like getAllAchievmentsForPlayer)

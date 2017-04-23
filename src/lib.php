@@ -18,6 +18,7 @@ class SteamStatsMania
 
     public function __construct($apiKey, $format = null, $dbParams = array())
     {
+        // @TODO Make an additional class for operations related to player
         $this->apiKey = $apiKey;
         if (!empty($format) && in_array($format, self::ALLOWED_FORMATS)) {
             $this->format = $format;
@@ -91,6 +92,27 @@ class SteamStatsMania
     {
         // TO DO
     }
+
+    private function setUserData($steamUserVanityName = null, $steamUserId = null)
+    {
+        if (empty($steamUserVanityName) && empty($steamUserId)) {
+            return false;
+        } elseif (!empty($steamUserVanityName)) {
+            $this->steamUserVanityName = $steamUserVanityName;
+            if (!empty($steamUserId)) {
+                $this->steamUserId = $steamUserId;
+            } else {
+                $this->steamUserId = $this->getSteamUserIdByVanityUrl($this->steamUserVanityName);
+            }
+        }
+
+        if (empty($this->steamUserId)) {
+            return false;
+        }
+        if (empty($this->steamUserVanityName)) {
+            $this->steamUserVanityName = $this->steamUserId;
+        }
+    }
     
     public function getSteamUserIdByVanityUrl($userId)
     {
@@ -163,23 +185,8 @@ class SteamStatsMania
     public function getAllAchievmentsForPlayer($steamUserVanityName = null, $steamUserId = null)
     {
         ini_set('max_execution_time', 1000);
-        if (empty($steamUserVanityName) && empty($steamUserId)) {
-            return false;
-        } elseif (!empty($steamUserVanityName)) {
-            $this->steamUserVanityName = $steamUserVanityName;
-            if (!empty($steamUserId)) {
-                $this->steamUserId = $steamUserId;
-            } else {
-                $this->steamUserId = $this->getSteamUserIdByVanityUrl($this->steamUserVanityName);
-            }
-        }
 
-        if (empty($this->steamUserId)) {
-            return false;
-        }
-        if (empty($this->steamUserVanityName)) {
-            $this->steamUserVanityName = $this->steamUserId;
-        }
+        $this->setUserData($steamUserVanityName, $steamUserId);
 
         $ownedGames = $this->getOwnedGames($this->steamUserId, true);
 
@@ -197,7 +204,8 @@ class SteamStatsMania
                    }
                    if ($aPNr) {
                        $query = "INSERT INTO `player_achievments`(player_vanity_name, game_name, achievements_nr, achieved_by_player)
-                                  VALUES(:steamUserVanityName, :game_name, :a_nr, :a_p_nr)";
+                                  VALUES(:steamUserVanityName, :game_name, :a_nr, :a_p_nr)
+                                  ON DUPLICATE KEY UPDATE achieved_by_player=VALUES(achieved_by_player)";
                        $stmt = $this->db->prepare($query);
                        try {
                            $stmt->execute(array(
@@ -216,5 +224,40 @@ class SteamStatsMania
             echo 'Finished';
 
         }
+    }
+
+    /**
+     * @param null $steamUserVanityName
+     * @param null $steamUserId
+     * @param bool $hours - if true, the method should return the number of hours
+     * @param bool $days - if true, the method should return the number of days. Ignored if $hours is false
+     */
+    public function getTotalPlayedTime($steamUserVanityName = null, $steamUserId = null, $hours = false, $days = false)
+    {
+        $this->setUserData($steamUserVanityName, $steamUserId);
+
+        $ownedGames = $this->getOwnedGames($this->steamUserId, true);
+
+        $minutes = 0;
+
+        if (!empty($ownedGames->games)) {
+            foreach ($ownedGames->games as $game) {
+                $minutes += $game->playtime_forever;
+            }
+        }
+
+        $str = $minutes . ' minutes';
+        if ($hours) {
+            $hours = intval(floor($minutes / 60));
+            $minutes = $minutes % 60;
+            $str = "{$hours} hours and {$minutes} minutes";
+            if ($days) {
+                $days = intval(floor($hours / 24));
+                $hours = $hours % 24;
+                $str = "{$days} days, {$hours} hours and {$minutes} minutes";
+            }
+        }
+
+        return $str;
     }
 }
