@@ -17,4 +17,4 @@ if ($useDb) {
 
 $api = new SteamStatsMania($apiKey, $dataFormat, $dbParams);
 
-$api->getAllAchievmentsForPlayer('restlesss');
+$api->getAllAchievementsForPlayer('restlesss');

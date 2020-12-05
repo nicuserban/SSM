@@ -12,9 +12,9 @@ class SteamStatsMania
     const API_ENDPOINT = 'http://api.steampowered.com';
     const ALLOWED_FORMATS = array('json', 'xml', 'vdf');
 
-    protected $apiKey;
-    protected $format = 'json';
-    protected $db = null;
+    private $apiKey;
+    private $format = 'json';
+    private $db = null;
 
     public function __construct($apiKey, $format = null, $dbParams = array())
     {
@@ -38,80 +38,6 @@ class SteamStatsMania
             }
         }
 
-    }
-
-    private function buildRequestUrl($interface, $method, $version, $params = array())
-    {
-        $requestUrl = self::API_ENDPOINT . '/' . $interface . '/' . $method . '/' . $version;
-        $requestUrl .= '?key=' . $this->apiKey;
-        $requestUrl .= '&format=' . $this->format;
-        if (!empty($params)) {
-            foreach ($params as $paramName => $paramVal) {
-                $requestUrl .= '&' . $paramName . '=' . $paramVal;
-            }
-        }
-        return $requestUrl;
-    }
-
-    private function makeRequest($interface, $method, $version, $params)
-    {
-        $url = $this->buildRequestUrl($interface, $method, $version, $params);
-
-        $curl = curl_init();
-        curl_setopt($curl, CURLOPT_URL, $url);
-        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-        $res = curl_exec($curl);
-        curl_close($curl);
-
-        if (empty($res)) {
-            // TO DO: Log wrong request/answer;
-            return false;
-        }
-
-        $decodeMethod = 'steam' . strtoupper($this->format) . 'Decode';
-        $data = $this->$decodeMethod($res);
-        if (empty($data)) {
-            // TO DO: Log error answer;
-            return false;
-        }
-
-        return $data;
-    }
-
-    private function steamJSONDecode($data)
-    {
-        return json_decode($data);
-    }
-
-    private function steamXMLDecode($data)
-    {
-        // TO DO
-    }
-
-    private function steamVDFDecode($data)
-    {
-        // TO DO
-    }
-
-    private function setUserData($steamUserVanityName = null, $steamUserId = null)
-    {
-        if (empty($steamUserVanityName) && empty($steamUserId)) {
-            return false;
-        } elseif (!empty($steamUserVanityName)) {
-            $this->steamUserVanityName = $steamUserVanityName;
-            if (!empty($steamUserId)) {
-                $this->steamUserId = $steamUserId;
-            } else {
-                $this->steamUserId = $this->getSteamUserIdByVanityUrl($this->steamUserVanityName);
-            }
-        }
-
-        if (empty($this->steamUserId)) {
-            return false;
-        }
-        if (empty($this->steamUserVanityName)) {
-            $this->steamUserVanityName = $this->steamUserId;
-        }
     }
 
     public function getSteamUserIdByVanityUrl($userId)
@@ -182,7 +108,7 @@ class SteamStatsMania
     }
 
     // Either vanity name or user id can be used
-    public function getAllAchievmentsForPlayer($steamUserVanityName = null, $steamUserId = null)
+    public function getAllAchievementsForPlayer($steamUserVanityName = null, $steamUserId = null)
     {
         ini_set('max_execution_time', 1000);
 
@@ -260,5 +186,78 @@ class SteamStatsMania
         }
 
         return $str;
+    }
+
+    private function buildRequestUrl($interface, $method, $version, $params = array())
+    {
+        $requestUrl = self::API_ENDPOINT . '/' . $interface . '/' . $method . '/' . $version;
+        $requestUrl .= '?key=' . $this->apiKey;
+        $requestUrl .= '&format=' . $this->format;
+        if (!empty($params)) {
+            foreach ($params as $paramName => $paramVal) {
+                $requestUrl .= '&' . $paramName . '=' . $paramVal;
+            }
+        }
+        return $requestUrl;
+    }
+
+    private function makeRequest($interface, $method, $version, $params)
+    {
+        $url = $this->buildRequestUrl($interface, $method, $version, $params);
+
+        $curl = curl_init();
+        curl_setopt($curl, CURLOPT_URL, $url);
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+        $res = curl_exec($curl);
+        curl_close($curl);
+
+        if (empty($res)) {
+            // TO DO: Log wrong request/answer;
+            return false;
+        }
+
+        switch ($this->format) {
+            case 'json':
+                $data = $this->steamJSONDecode($res);
+                break;
+            default:
+                throw new Exception('Unsupported format ' . $this->format);
+                break;
+        }
+
+        if (empty($data)) {
+            // TO DO: Log error answer;
+            return false;
+        }
+
+        return $data;
+    }
+
+    private function setUserData($steamUserVanityName = null, $steamUserId = null)
+    {
+        if (empty($steamUserVanityName) && empty($steamUserId)) {
+            return false;
+        } elseif (!empty($steamUserVanityName)) {
+            $this->steamUserVanityName = $steamUserVanityName;
+            if (!empty($steamUserId)) {
+                $this->steamUserId = $steamUserId;
+            } else {
+                $this->steamUserId = $this->getSteamUserIdByVanityUrl($this->steamUserVanityName);
+            }
+        }
+
+        if (empty($this->steamUserId)) {
+            return false;
+        }
+        if (empty($this->steamUserVanityName)) {
+            $this->steamUserVanityName = $this->steamUserId;
+        }
+
+        return $this;
+    }
+
+    private function steamJSONDecode($data)
+    {
+        return json_decode($data);
     }
 }
